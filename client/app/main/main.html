@@ -1,28 +1,162 @@
-<div ng-include="'components/navbar/navbar.html'"></div>
-
-<header class="hero-unit" id="banner">
-  <div class="container">
-    <h1>'Allo, 'Allo!</h1>
-    <p class="lead">Kick-start your next web app with Angular Fullstack</p>
-    <img src="assets/images/yeoman.png" alt="I'm Yeoman">
-  </div>
-</header>
-
 <div class="container">
   <div class="row">
-    <div class="col-lg-12">
-      <h1 class="page-header">Features:</h1>
-      <ul class="nav nav-tabs nav-stacked col-md-4 col-lg-4 col-sm-6" ng-repeat="thing in awesomeThings">
-        <li><a href="#" tooltip="{{thing.info}}">{{thing.name}}</a></li>
-      </ul>
-    </div>
-  </div>
-</div>
+    <div class="col-md-6 col-md-offset-3 panel panel-default">
+      <div ng-hide="isLoggedIn()">
+        <h1 class="margin-base-vertical">Welcome to Gifchat</h1>
+          <p>
+            A picture means a thousand words, however a gif means 10,000
+          </p>
+          <p>
+            If you're new signup! Else Sign in below
+          </p>
+          <div ng-hide="activeLogin || activeSignup">
+            <a ng-click="activateLogin()">
+                <button type="button" class="btn btn-default btn-lg">
+                    <span class="glyphicon glyphicon-globe"></span>Sign in!
+                </button>
+            </a>
+            <a ng-click="activateSignup()">
+                <button type="button" class="btn btn-default btn-lg" href="/signup">
+                    <span class="glyphicon glyphicon-envelope"></span>Sign up
+                </button>
+            </a>
+          </div>
+      </div>
+      <div ng-show="isLoggedIn()">
+        <h1 class="margin-base-vertical">Welcome back {{getCurrentUser().name}} did you miss me?</h1>
+          <div>
+            <a href="/chatroom">
+                <button type="button" class="btn btn-default btn-lg">
+                    <span class="glyphicon glyphicon-globe"></span>Take me back to the gifs!
+                </button>
+            </a>
+          </div>
+      </div>    
+      <form class="form" name="form" ng-submit="register(form)" ng-show="activeSignup" novalidate>
 
-<footer class="footer">
-  <div class="container">
-      <p>Angular Fullstack v2.0.13 |
-        <a href="https://twitter.com/tyhenkel">@tyhenkel</a> |
-         <a href="https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open">Issues</a></p>
-  </div>
-</footer>
+        <div class="form-group" ng-class="{ 'has-success': form.name.$valid && submitted,
+                                            'has-error': form.name.$invalid && submitted }">
+          <label>Name</label>
+          <p class="input-group">
+              <span class="input-group-addon"><span class="icon-envelope"></span></span>
+              <input type="text" name="name" class="form-control" ng-model="user.name"
+                 placeholder=" e.g. John Smith" required />
+          </p>
+          <p class="help-block" ng-show="form.name.$error.required && submitted">
+            A name is required
+          </p>
+        </div>
+
+        <div class="form-group" ng-class="{ 'has-success': form.email.$valid && submitted,
+                                            'has-error': form.email.$invalid && submitted }">
+          <label>Email</label>
+          <p class="input-group">
+              <span class="input-group-addon"><span class="icon-envelope"></span></span>
+              <input type="email" name="email" class="form-control" ng-model="user.email"
+                 placeholder=" johnsmith@example.com" required mongoose-error/>
+          </p>
+          <p class="help-block" ng-show="form.email.$error.email && submitted">
+            Doesn't look like a valid email.
+          </p>
+          <p class="help-block" ng-show="form.email.$error.required && submitted">
+            What's your email address?
+          </p>
+          <p class="help-block" ng-show="form.email.$error.mongoose">
+            {{ errors.email }}
+          </p>
+        </div>
+
+        <div class="form-group" ng-class="{ 'has-success': form.password.$valid && submitted,
+                                            'has-error': form.password.$invalid && submitted }">
+          <label>Password</label>
+          <p class="input-group">
+              <span class="input-group-addon"><span class="icon-envelope"></span></span>
+              <input type="password" name="password" class="form-control" ng-model="user.password"
+                 ng-minlength="3"
+                 required
+                 mongoose-error/>
+          </p>
+          <p class="help-block"
+             ng-show="(form.password.$error.minlength || form.password.$error.required) && submitted">
+            Password must be at least 3 characters.
+          </p>
+          <p class="help-block" ng-show="form.password.$error.mongoose">
+            {{ errors.password }}
+          </p>
+        </div>
+
+        <div>
+          <button class="btn btn-inverse btn-lg btn-login" type="submit">
+            Sign up
+          </button>
+          <a class="btn btn-default btn-lg btn-register" href="/login">
+            Login
+          </a>
+        </div>
+
+        <hr>
+        <div>
+          <a class="btn btn-facebook" href="" ng-click="loginOauth('facebook')">
+            <i class="fa fa-facebook"></i> Connect with Facebook
+          </a>
+          <a class="btn btn-google-plus" href="" ng-click="loginOauth('google')">
+            <i class="fa fa-google-plus"></i> Connect with Google+
+          </a>
+          <a class="btn btn-twitter" href="" ng-click="loginOauth('twitter')">
+            <i class="fa fa-twitter"></i> Connect with Twitter
+          </a>
+        </div>
+      </form>
+
+      <!-- SignIn form -->
+      <form class="form" name="form" ng-submit="login(form)" ng-show="activeLogin" novalidate>
+
+        <div class="form-group">
+          <label>Email</label>
+
+          <input type="email" name="email" class="form-control" ng-model="user.email" required>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+
+          <input type="password" name="password" class="form-control" ng-model="user.password" required>
+        </div>
+
+        <div class="form-group has-error">
+          <p class="help-block" ng-show="form.email.$error.required && form.password.$error.required && submitted">
+             Please enter your email and password.
+          </p>
+          <p class="help-block" ng-show="form.email.$error.email && submitted">
+             Please enter a valid email.
+          </p>
+
+          <p class="help-block">{{ errors.other }}</p>
+        </div>
+
+        <div>
+          <button class="btn btn-inverse btn-lg btn-login" type="submit">
+            Login
+          </button>
+        </div>
+
+        <hr>
+        <div>
+          <a class="btn btn-facebook" href="" ng-click="loginOauth('facebook')">
+            <i class="fa fa-facebook"></i> Connect with Facebook
+          </a>
+          <a class="btn btn-google-plus" href="" ng-click="loginOauth('google')">
+            <i class="fa fa-google-plus"></i> Connect with Google+
+          </a>
+          <a class="btn btn-twitter" href="" ng-click="loginOauth('twitter')">
+            <i class="fa fa-twitter"></i> Connect with Twitter
+          </a>
+        </div>
+      </form>
+      <!-- End og signinForm -->
+
+      <div class="margin-base-vertical">
+      </div>
+    </div><!-- //main content -->
+  </div><!-- //row -->
+</div> <!-- //container -->
