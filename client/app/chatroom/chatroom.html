@@ -11,6 +11,7 @@
 	        <li>
 	        	<h4><a ng-click="addFriend()">Add a Friend</a><h4>
 	        	<input ng-show="added" type="text" ng-model="newUser" class="form-control" placeholder="username...">
+	        	<!-- also need to check on submit user exists in mongo -->
 				<button ng-show="added" type="submit" ng-click="setFriendUsername(newUser); addMessage('you are now connected!'); addFriend()" class="btn btn-xs" >Add Friend</button>
 	        </li>
 	        <li ng-repeat="user in messages">
@@ -28,7 +29,7 @@
         <div class="container-fluid">
             <div class="row">
                 <h1>Welcome back {{username}}, you are now chatting with {{friendsName}}</h1>
-		        <div class="commentArea yolo">
+		        <div class="commentArea yolo" scroll-glue="glued">
 		        	<div ng-repeat="texts in privateMessages" ng-class="texts.username == username ? 'bubbledRight' : 'bubbledLeft'">
 		            {{texts.text}}
 		        	</div>
@@ -42,5 +43,3 @@
         </div>
     </div>
 </div>
-
-
